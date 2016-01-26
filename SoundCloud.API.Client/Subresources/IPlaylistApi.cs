@@ -6,6 +6,7 @@ namespace SoundCloud.API.Client.Subresources
     {
         //note: GetPlaylists doesn't support. Returns 500. You can try it here: https://developers.soundcloud.com/console
         SCPlaylist GetPlaylist();
+        void UpdatePlaylist(SCPlaylist playlist);
 
         //todo:
         //GET, POST, PUT, DELETE	/playlists/{id}/shared-to/users	users who have access to the track

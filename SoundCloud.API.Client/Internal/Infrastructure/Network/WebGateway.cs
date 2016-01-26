@@ -119,7 +119,7 @@ namespace SoundCloud.API.Client.Internal.Infrastructure.Network
 
         private static WebRequest BuildRequest(IUriBuilder uriBuilder, HttpMethod method, Dictionary<string, object> parameters, byte[] body, out Func<int, string, string> buildExceptionMessage)
         {
-            var uri = uriBuilder.AddQueryParameters(parameters).Build();
+            var uri = method != HttpMethod.Put ? uriBuilder.AddQueryParameters(parameters).Build() : uriBuilder.Build();
             var request = WebRequest.Create(uri);
 
             request.Method = method.GetParameterName();
@@ -127,7 +127,14 @@ namespace SoundCloud.API.Client.Internal.Infrastructure.Network
             request.ContentType = "application/json";
 
             body = body ?? new byte[0];
-            if (method == HttpMethod.Post && body.Length > 0)
+            if (method == HttpMethod.Put)
+            {
+                var serializer = new SoundCloud.API.Client.Internal.Infrastructure.Serialization.JsonSerializer();
+                var serialized = serializer.Serialize(parameters);
+                body = Encoding.UTF8.GetBytes(serialized);
+
+            }
+            if ((method == HttpMethod.Post || method == HttpMethod.Put) && body.Length > 0)
             {
                 request.ContentLength = body.Length;
                 using (var requestStream = request.GetRequestStream())

@@ -82,7 +82,7 @@ namespace SoundCloud.API.Client.Internal.Converters
                 PermalinkUrl = playlist.PermalinkUrl,
                 Uri = playlist.Uri,
                 Sharing = playlist.Sharing.GetParameterName(),
-                EmbeddableBy = playlist.Sharing.GetParameterName(),
+                EmbeddableBy = playlist.EmbeddableBy.GetParameterName(),
                 PurchaseUrl = playlist.PurchaseUrl,
                 ArtworkUrl = playlist.Artwork == null? null : playlist.Artwork.Url(),
                 Description = playlist.Description,

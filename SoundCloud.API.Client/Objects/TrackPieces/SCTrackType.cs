@@ -41,6 +41,9 @@ namespace SoundCloud.API.Client.Objects.TrackPieces
         Sample,
 
         [Parameter("other")]
-        Other
+        Other,
+
+        [Parameter("ep single")]
+        EpSingle
     }
 }

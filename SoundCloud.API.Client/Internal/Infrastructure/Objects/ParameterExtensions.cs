@@ -80,13 +80,20 @@ namespace SoundCloud.API.Client.Internal.Infrastructure.Objects
             var properties = typeof(T).GetProperties();
             foreach (var property in properties)
             {
-                if (!property.PropertyType.IsPrimitive && !(property.PropertyType == typeof(string)))
+                if (!property.PropertyType.IsPrimitive && !(property.PropertyType == typeof(string)) &&
+                    (property.PropertyType != typeof(SoundCloud.API.Client.Internal.Objects.Track[])))
                 {
                     continue;
                 }
 
                 var jsonProperty = property.GetCustomAttributes(typeof(JsonPropertyAttribute), false).FirstOrDefault() as JsonPropertyAttribute;
                 if (jsonProperty == null)
+                {
+                    continue;
+                }
+
+                var jsonIgnore = property.GetCustomAttributes(typeof(JsonIgnoreAttribute), false).FirstOrDefault() as JsonIgnoreAttribute;
+                if(jsonIgnore != null)
                 {
                     continue;
                 }
@@ -100,8 +107,40 @@ namespace SoundCloud.API.Client.Internal.Infrastructure.Objects
                 var fromValue = getMethod.Invoke(@from, new object[0]);
                 var toValue = getMethod.Invoke(to, new object[0]);
 
-                if ((fromValue == null && toValue == null) || (fromValue != null && fromValue.Equals(toValue)))
+                if (property.PropertyType != typeof(SoundCloud.API.Client.Internal.Objects.Track[]))
                 {
+
+                    if ((fromValue == null && toValue == null) || (fromValue != null && fromValue.Equals(toValue)))
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    var add = true;
+                    var fromArray = fromValue as SoundCloud.API.Client.Internal.Objects.Track[];
+                    var toArray = toValue as SoundCloud.API.Client.Internal.Objects.Track[];
+                    if(fromArray.Length == toArray.Length)
+                    {
+                        add = false;
+                        for(var i=0; i < fromArray.Length; i++)
+                        {
+                            if(fromArray[i].Id != toArray[i].Id)
+                            {
+                                add = true;
+                                break;
+                            }
+                        }
+                    }
+                    if(add)
+                    {
+                        diff.Add(
+                            jsonProperty.PropertyName,
+                            fromArray.Select(x => new
+                            {
+                                id = x.Id
+                            }).ToArray());
+                    }
                     continue;
                 }
 
